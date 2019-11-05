@@ -1,20 +1,20 @@
 #include "node.h"
 
-WSNNode::WSNNode(){}
+Node::Node(){}
 
-WSNNode::WSNNode(int _x):x(_x){}
+Node::Node(int _x):x(_x){}
 
-WSNNode::WSNNode(int _x,int _y):x(_x),y(_y){}
+Node::Node(int _x,int _y):x(_x),y(_y){}
 
-WSNNode::WSNNode(int _x,int _y,int _id,double _energy=double(100)):x(_x),y(_y),id(_id),energy(_energy){}
+Node::Node(int _x,int _y,int _id,double _energy=double(100)):x(_x),y(_y),id(_id),energy(_energy){}
 
-WSNNode::WSNNode(int _x,int _y,int _id,double _energy,Scalar _color):
+Node::Node(int _x,int _y,int _id,double _energy,Scalar _color):
 	x(_x),y(_y),id(_id),energy(_energy),color(_color){}
 
-WSNNode::~WSNNode(void){}
+Node::~Node(void){}
 
 
-Scalar  WSNNode::NodeColor(){
+Scalar  Node::NodeColor(){
 		if(energy>75)
 		{color=Scalar(255,0,0);}  
 		else if(energy>56)
@@ -30,7 +30,7 @@ Scalar  WSNNode::NodeColor(){
 		return color;
 	}
 
-int WSNNode:: layer (){
+int Node:: layer (){
 		if (distance()<303)
 		return 0;
 		else if(distance()<428)
@@ -44,8 +44,8 @@ int WSNNode:: layer (){
 	}
 
 
-int WSNNode::GetNodeID()const
+int Node::GetNodeID()const
 {return id;}
 
-Scalar WSNNode::GetNodeColor()const
+Scalar Node::GetNodeColor()const
 {return color;}
