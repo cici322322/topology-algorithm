@@ -1,10 +1,10 @@
 #include "topology.h"
 
-WSNTopologyBasedEnergy::WSNTopologyBasedEnergy(TransportType type){
+Energy::Energy(TransportType type){
 	type_ = type;
 	img = Mat(600,600,CV_8UC3,Scalar(255,255,255));
 	Test= true;
-	sink=WSNNode(0,0);
+	sink=Node(0,0);
 	alpha = 0.00002;
 	TopLayer=0;
 	ENERGY=100;
@@ -15,7 +15,7 @@ WSNTopologyBasedEnergy::WSNTopologyBasedEnergy(TransportType type){
 	}
 }
 
-int WSNTopologyBasedEnergy::InitNode(int width, int heigth,  int NodeNum)
+int Energy::InitNode(int width, int heigth,  int NodeNum)
 {
 	if(NodeNum > width * heigth)
 		return 0;
@@ -27,18 +27,18 @@ int WSNTopologyBasedEnergy::InitNode(int width, int heigth,  int NodeNum)
 		int row = rand() % width;
 		int col = rand() % heigth;
 
-		node[i]=WSNNode(col,row,i,ENERGY,Scalar(255,0,0));
+		node[i]=Node(col,row,i,ENERGY,Scalar(255,0,0));
 		drawCrossNode(img,node[i],Scalar(255,0,0));
 
-		imshow("WSN",img);
+		imshow("network",img);
 		if(true==Test) waitKey(30);
 	}
-	imshow("WSN", img);
+	imshow("network", img);
 	if(true==Test) waitKey();
 	return 1;
 }
 
-void WSNTopologyBasedEnergy::ClassifyNode()
+void Energy::ClassifyNode()
 {
 	for(int i=0;i<NODENUM;i++)
 	{
@@ -55,36 +55,36 @@ void WSNTopologyBasedEnergy::ClassifyNode()
 	}
 }
 
-void WSNTopologyBasedEnergy::DrawWSNLayer()
+void Energy::DrawLayer()
 {
 	circle(img,Point(0,0),1,Scalar(255,0,255));
-	imshow("WSN",img);
+	imshow("network",img);
 	if(true==Test) waitKey(200);
 
 	circle(img,Point(0,0),303,Scalar(255,0,255));
-	imshow("WSN",img);
+	imshow("network",img);
 	if(true==Test) waitKey(200);
 
 	circle(img,Point(0,0),428,Scalar(255,0,255));
-	imshow("WSN",img);
+	imshow("network",img);
 	if(true==Test) waitKey(200);
 
 	circle(img,Point(0,0),524,Scalar(255,0,255));
-	imshow("WSN",img);
+	imshow("network",img);
 	if(true==Test) waitKey(200);
 
 	circle(img,Point(0,0),608,Scalar(255,0,255));
-	imshow("WSN",img);
+	imshow("network",img);
 	if(true==Test) waitKey();
 }
 
-void WSNTopologyBasedEnergy::FindLayerFirstLinkNode()
+void Energy::FindLayerFirstLinkNode()
 {
-	vector<WSNNode>::iterator it;
+	vector<Node>::iterator it;
 
 	for(int i=0;i<LayerNum;i++)
 	{
-		WSNNode FirstLinkNode(600);
+		Node FirstLinkNode(600);
 		for(it=layer[i].begin();it!=layer[i].end();it++)
 		{
 			if(it->x<FirstLinkNode.x)
@@ -98,9 +98,9 @@ void WSNTopologyBasedEnergy::FindLayerFirstLinkNode()
 	if(true==Test) waitKey();
 }
 
-void WSNTopologyBasedEnergy::LinkNodeEachLayer()
+void Energy::LinkNodeEachLayer()
 {
-	vector<WSNNode> temp1;
+	vector<Node> temp1;
 
 	for(int i=0;i<LayerNum;i++)
 	{
@@ -108,13 +108,13 @@ void WSNTopologyBasedEnergy::LinkNodeEachLayer()
 		int temp1cap=temp1.size();
 		LayerLeaderSeq[i].clear();
 		LayerLeaderSeq[i].push_back(LayerFirstLinkNode[i]);
-		vector<WSNNode>::iterator it;
+		vector<Node>::iterator it;
 
 		while( LayerLeaderSeq[i].size()<unsigned int(temp1cap+1))
 
 		{
-			WSNNode NextNode=*(temp1.begin());
-			vector<WSNNode>::iterator p;
+			Node NextNode=*(temp1.begin());
+			vector<Node>::iterator p;
 
 			for(it=temp1.begin();it!=temp1.end();it++)
 			{
@@ -135,7 +135,7 @@ void WSNTopologyBasedEnergy::LinkNodeEachLayer()
 		for(it=LayerLeaderSeq[i].begin();it!=LayerLeaderSeq[i].end()-1;it++)
 		{
 			line(img, Point(it->x,it->y), Point((it+1)->x,(it+1)->y), Scalar(155,155,155),1,8,0);  
-			imshow("WSN",img);
+			imshow("network",img);
 			if(true==Test) waitKey(30);
 		}
 		if(true==Test) waitKey(200);
@@ -143,7 +143,7 @@ void WSNTopologyBasedEnergy::LinkNodeEachLayer()
 	if(true==Test) waitKey();
 }
 
-int WSNTopologyBasedEnergy::WSNLifeTime()
+int Energy::LifeTime()
 {
 	int i=-1;
 	int SentCount=0;
@@ -151,10 +151,10 @@ int WSNTopologyBasedEnergy::WSNLifeTime()
 	while(SentCount+1)
 	{
 
-		if(type_==ConstPowertoLeader)
-			NodeSentSignalSamePower();
-		else if(type_==VarPowertoLeaderAndSinkShift)
-			NodeSentSignalVarPower();
+		if(type_==ConstTXtoLeader)
+			NodeSentSignalConstTX();
+		else if(type_==VarTXtoLeader)
+			NodeSentSignalVarTX();
 
 
 
@@ -164,7 +164,7 @@ int WSNTopologyBasedEnergy::WSNLifeTime()
 			{
 				BREAK=true;
 				circle(img,Point(node[i].x,node[i].y),5,Scalar(0,0,0),3,8,0);
-				imshow("WSN",img);
+				imshow("network",img);
 				break;
 			}
 		}
@@ -179,7 +179,7 @@ int WSNTopologyBasedEnergy::WSNLifeTime()
 	return i;
 }
 
-void WSNTopologyBasedEnergy::drawCrossNode(Mat &img, WSNNode node, Scalar color)
+void Energy::drawCrossNode(Mat &img, Node node, Scalar color)
 {
 	int col = node.x > 2 ? node.x : 2;
 	int row = node.y> 2 ? node.y : 2;
@@ -188,17 +188,17 @@ void WSNTopologyBasedEnergy::drawCrossNode(Mat &img, WSNNode node, Scalar color)
 	line(img, Point(col + 2, row - 2), Point(col - 2, row + 2), color,2,8,0);  
 }
 
-double WSNTopologyBasedEnergy::DistanceBetweenNodes(WSNNode node1,WSNNode node2)
+double Energy::DistanceBetweenNodes(Node node1,Node node2)
 {
 	return sqrt(   (node1.x-node2.x)*(node1.x-node2.x) + (node1.y-node2.y)*(node1.y-node2.y)   );
 }
 
-double WSNTopologyBasedEnergy::SDistanceBetweenNodes(WSNNode node1,WSNNode node2)
+double Energy::SDistanceBetweenNodes(Node node1,Node node2)
 {
 	return ( (node1.x-node2.x)*(node1.x-node2.x) + (node1.y-node2.y)*(node1.y-node2.y) )  ;
 }
 
-vector<int> WSNTopologyBasedEnergy::SelectServalNode()
+vector<int> Energy::SelectSeveralNode()
 {
 	vector<int> SelectNodeSeq;
 	vector<int>::iterator it;
@@ -215,20 +215,20 @@ vector<int> WSNTopologyBasedEnergy::SelectServalNode()
 		{
 			drawCrossNode(img,node[*it],Scalar(255,255,255));
 		}
-		cv::imshow("WSN",img);
+		cv::imshow("network",img);
 		if(true==Test) waitKey(70);
 		for(it=SelectNodeSeq.begin();it!=SelectNodeSeq.end();it++)
 		{
 			drawCrossNode(img,node[*it],node[*it].NodeColor());	
 		}
-		cv::imshow("WSN",img);
+		cv::imshow("network",img);
 		if(true==Test) waitKey(70);
 	}
 	return SelectNodeSeq;
 }
-void WSNTopologyBasedEnergy::SelectLeaderID()
+void Energy::SelectLeaderID()
 {
-	vector<WSNNode>::iterator it;
+	vector<Node>::iterator it;
 	int i=0;
 	while(i<LayerNum)
 	{
@@ -256,10 +256,10 @@ void WSNTopologyBasedEnergy::SelectLeaderID()
 
 	}
 }
-void WSNTopologyBasedEnergy::TopLayer0SentSink()
+void Energy::TopLayer0Sink()
 {
 	vector<int>::iterator it;
-	vector<int> _array=SelectServalNode();
+	vector<int> _array=SelectSeveralNode();
 	for(it=_array.begin();it!=_array.end();it++)
 	{
 		Mat tempimg=img.clone();
@@ -268,7 +268,7 @@ void WSNTopologyBasedEnergy::TopLayer0SentSink()
 		for(int i=0;i<LayerNum-1;i++)
 		{
 			line(tempimg,Point(LayerLeaderNode[i].x,LayerLeaderNode[i].y),Point(LayerLeaderNode[i+1].x,LayerLeaderNode[i+1].y),Scalar(0,255,0));
-			imshow("WSN",tempimg);
+			imshow("network",tempimg);
 		}
 		if(true==Test) waitKey(100);
 		if(0==node[*it].layer())
@@ -310,31 +310,31 @@ void WSNTopologyBasedEnergy::TopLayer0SentSink()
 		}
 
 		drawCrossNode(img,node[*it],node[*it].NodeColor());
-		imshow("WSN",img);	
+		imshow("network",img);	
 
 	for(int i=0;i<NODENUM;i++)
 	{
 		drawCrossNode(img,node[i],node[i].NodeColor());
-		imshow("WSN",img);
+		imshow("network",img);
 	}
 	if(true==Test) waitKey(400); 
 }
 
-void WSNTopologyBasedEnergy::TopLayer1SentSink()
+void Energy::TopLayer1Sink()
 {
 	vector<int>::iterator it;
-	vector<int> _array=SelectServalNode();
+	vector<int> _array=SelectSeveralNode();
 	for(it=_array.begin();it!=_array.end();it++)
 	{
 		Mat tempimg=img.clone();
 
 		SelectLeaderID();
 
-		line(tempimg,Point(0,0),Point(LayerLeaderNode[1].x,LayerLeaderNode[1].y),Scalar(45,150,45),1,8,0);//用黑绿色直线连接sink节点和顶层节点
+		line(tempimg,Point(0,0),Point(LayerLeaderNode[1].x,LayerLeaderNode[1].y),Scalar(45,150,45),1,8,0);
 		for(int i=0;i<LayerNum-1;i++)
 		{
 			line(tempimg,Point(LayerLeaderNode[i].x,LayerLeaderNode[i].y),Point(LayerLeaderNode[i+1].x,LayerLeaderNode[i+1].y),Scalar(0,255,0));
-			imshow("WSN",tempimg);
+			imshow("network",tempimg);
 		}
 		if(true==Test) waitKey(100);
 		if(0==node[*it].layer())
@@ -373,21 +373,21 @@ void WSNTopologyBasedEnergy::TopLayer1SentSink()
 		}
 
 		drawCrossNode(img,node[*it],node[*it].NodeColor());
-		imshow("WSN",img);	
+		imshow("network",img);	
 	}
 
 	for(int i=0;i<NODENUM;i++)
 	{
 		drawCrossNode(img,node[i],node[i].NodeColor());
-		imshow("WSN",img);
+		imshow("network",img);
 	}
 	if(true==Test) waitKey(400);
 }
 
-void WSNTopologyBasedEnergy::TopLayer2SentSink()
+void Energy::TopLayer2Sink()
 {
 	vector<int>::iterator it;
-	vector<int> _array=SelectServalNode();
+	vector<int> _array=SelectSeveralNode();
 	for(it=_array.begin();it!=_array.end();it++)
 	{
 		Mat tempimg=img.clone();
@@ -396,7 +396,7 @@ void WSNTopologyBasedEnergy::TopLayer2SentSink()
 		for(int i=0;i<LayerNum-1;i++)
 		{
 			line(tempimg,Point(LayerLeaderNode[i].x,LayerLeaderNode[i].y),Point(LayerLeaderNode[i+1].x,LayerLeaderNode[i+1].y),Scalar(0,255,0));
-			imshow("WSN",tempimg);
+			imshow("network",tempimg);
 		}
 		if(true==Test) waitKey(100);
 		if(0==node[*it].layer())
@@ -432,20 +432,20 @@ void WSNTopologyBasedEnergy::TopLayer2SentSink()
 			node[LayerLeaderNode[3].GetNodeID()].energy-=1;
 		}
 		drawCrossNode(img,node[*it],node[*it].NodeColor());
-		imshow("WSN",img);	
+		imshow("network",img);	
 	}
 	for(int i=0;i<NODENUM;i++)
 	{
 		drawCrossNode(img,node[i],node[i].NodeColor());
-		imshow("WSN",img);
+		imshow("network",img);
 	}
 	if(true==Test) waitKey(400);
 }
 
-void WSNTopologyBasedEnergy::TopLayer3SentSink()
+void Energy::TopLayer3Sink()
 {
 	vector<int>::iterator it;
-	vector<int> _array=SelectServalNode();
+	vector<int> _array=SelectSeveralNode();
 	for(it=_array.begin();it!=_array.end();it++)
 	{
 		Mat tempimg=img.clone();
@@ -456,7 +456,7 @@ void WSNTopologyBasedEnergy::TopLayer3SentSink()
 		for(int i=0;i<LayerNum-1;i++)
 		{
 			line(tempimg,Point(LayerLeaderNode[i].x,LayerLeaderNode[i].y),Point(LayerLeaderNode[i+1].x,LayerLeaderNode[i+1].y),Scalar(0,255,0));
-			imshow("WSN",tempimg);
+			imshow("network",tempimg);
 		}
 		if(true==Test) waitKey(100);
 		if(0==node[*it].layer())
@@ -494,18 +494,18 @@ void WSNTopologyBasedEnergy::TopLayer3SentSink()
 		}
 
 		drawCrossNode(img,node[*it],node[*it].NodeColor());
-		imshow("WSN",img);	
+		imshow("network",img);	
 	}
 
 	for(int i=0;i<NODENUM;i++)
 	{
 		drawCrossNode(img,node[i],node[i].NodeColor());
-		imshow("WSN",img);
+		imshow("network",img);
 	}
 	if(true==Test) waitKey(400); 
 }
 
-void WSNTopologyBasedEnergy::TopLayer4SentSink()
+void Energy::TopLayer4Sink()
 {
 	vector<int>::iterator it;
 	vector<int> _array=SelectServalNode();
@@ -519,7 +519,7 @@ void WSNTopologyBasedEnergy::TopLayer4SentSink()
 		for(int i=0;i<LayerNum-1;i++)
 		{
 			line(tempimg,Point(LayerLeaderNode[i].x,LayerLeaderNode[i].y),Point(LayerLeaderNode[i+1].x,LayerLeaderNode[i+1].y),Scalar(0,255,0));
-			imshow("WSN",tempimg);
+			imshow("network",tempimg);
 		}
 		if(true==Test) waitKey(100);
 
@@ -561,19 +561,19 @@ void WSNTopologyBasedEnergy::TopLayer4SentSink()
 		}
 
 		drawCrossNode(img,node[*it],node[*it].NodeColor());
-		imshow("WSN",img);	
+		imshow("network",img);	
 	}
 	
 	for(int i=0;i<NODENUM;i++)
 	{
 		drawCrossNode(img,node[i],node[i].NodeColor());
-		imshow("WSN",img);
+		imshow("network",img);
 	}
 	if(true==Test) waitKey(400);
 }
 
 
-int WSNTopologyBasedEnergy::MinMark()
+int Energy::MinMark()
 {
 	int min=Mark[0];
 	int j=0;
@@ -588,25 +588,25 @@ int WSNTopologyBasedEnergy::MinMark()
 	return j;
 }
 
-void WSNTopologyBasedEnergy::NodeSentSignalVarPower()
+void Energy::NodeSentSignalVarTX()
 {
 	if(0==MinMark())
-		TopLayer0SentSink();
+		TopLayer0Sink();
 	else if(1==MinMark())
-		TopLayer1SentSink();
+		TopLayer1Sink();
 	else if(2==MinMark())
-		TopLayer2SentSink();
+		TopLayer2Sink();
 	else if(3==MinMark())
-		TopLayer3SentSink();
+		TopLayer3Sink();
 	else 
-		TopLayer4SentSink();
+		TopLayer4Sink();
 
 }
 
-void WSNTopologyBasedEnergy::NodeSentSignalSamePower()
+void Energy::NodeSentSignalConstTX()
 {
 	vector<int>::iterator it;
-	vector<int> _array=SelectServalNode();
+	vector<int> _array=SelectSeveralNode();
 	for(it=_array.begin();it!=_array.end();it++)
 	{
 		SelectLeaderID();
@@ -640,12 +640,12 @@ void WSNTopologyBasedEnergy::NodeSentSignalSamePower()
 		}
 
 		drawCrossNode(img,node[*it],node[*it].NodeColor());
-		imshow("WSN",img);	
+		imshow("network",img);	
 	}
 	for(int i=0;i<LayerNum;i++)
 	{
 		drawCrossNode(img,node[LayerLeaderNode[i].GetNodeID()],node[LayerLeaderNode[i].GetNodeID()].NodeColor());
-		imshow("WSN",img);
+		imshow("network",img);
 	}
 	if(true==Test) waitKey(400);
 }
