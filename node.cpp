@@ -1,4 +1,4 @@
-#include "wsnnode.h"
+#include "node.h"
 
 WSNNode::WSNNode(){}
 
@@ -17,13 +17,13 @@ WSNNode::~WSNNode(void){}
 Scalar  WSNNode::NodeColor(){
 		if(energy>75)
 		{color=Scalar(255,0,0);}  
-		else if(energy>56.25)
+		else if(energy>56)
 		{color=Scalar(0,255,255);}
-		else if(energy>42.1875)
+		else if(energy>42)
 		{color=Scalar(0,128,255);}
-		else if(energy>31.640625)
+		else if(energy>31)
 		{color=Scalar(0,0,255);} 
-		else if(energy>23.73046875)
+		else if(energy>23)
 		{color=Scalar(140,140,140);}
 		else
 		{color=Scalar(0,0,0);}
