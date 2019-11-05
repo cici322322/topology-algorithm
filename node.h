@@ -5,15 +5,15 @@
 
 using namespace cv;
 
-class WSNNode
+class Node
 {
 public:
-	WSNNode();
-	WSNNode(int );
-	WSNNode(int ,int );
-	WSNNode(int _x,int _y,int _number,double _energy);
-	WSNNode(int _x,int _y,int _number,double _energy,Scalar _color);
-	~WSNNode(void);
+	Node();
+	Node(int );
+	Node(int ,int );
+	Node(int _x,int _y,int _number,double _energy);
+	Node(int _x,int _y,int _number,double _energy,Scalar _color);
+	~Node(void);
 	float distance()const{return sqrt(float(x*x+y*y));}
 	int layer ();
 	Scalar NodeColor();
