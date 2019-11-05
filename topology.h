@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <opencv2\opencv.hpp>
-#include "wsnnode.h"
+#include "node.h"
 
 using namespace std;
 using namespace cv;
